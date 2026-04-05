@@ -1,0 +1,276 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap');
+
+:root {
+  --bg: #0d0d0d;
+  --surface: #161616;
+  --border: #2a2a2a;
+  --accent: #e8ff3a;
+  --accent-dim: rgba(232, 255, 58, 0.12);
+  --text: #f0f0f0;
+  --muted: #666;
+  --win: #3aff8a;
+  --lose: #ff4d4d;
+  --tie: #e8ff3a;
+}
+
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2.5rem;
+  padding: 2rem;
+  overflow-x: hidden;
+}
+
+/* Subtle grid background */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(2.8rem, 8vw, 5rem);
+  letter-spacing: 0.12em;
+  color: var(--text);
+  text-align: center;
+  position: relative;
+  z-index: 1;
+  line-height: 1;
+}
+
+h1::after {
+  content: '';
+  display: block;
+  width: 60px;
+  height: 4px;
+  background: var(--accent);
+  margin: 0.5rem auto 0;
+  border-radius: 2px;
+}
+
+/* ─── Choices ─── */
+.choices {
+  display: flex;
+  gap: 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.choice {
+  width: 120px;
+  height: 120px;
+  border-radius: 16px;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+  overflow: hidden;
+  position: relative;
+}
+
+.choice::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--accent-dim);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.choice:hover {
+  transform: translateY(-8px) scale(1.04);
+  border-color: var(--accent);
+  box-shadow: 0 16px 40px rgba(232, 255, 58, 0.15), 0 0 0 1px var(--accent);
+}
+
+.choice:hover::before {
+  opacity: 1;
+}
+
+.choice:active {
+  transform: translateY(-4px) scale(0.98);
+}
+
+/* Clicked animation */
+.choice.clicked {
+  animation: pulse-click 0.35s ease forwards;
+}
+
+@keyframes pulse-click {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(0.9); border-color: var(--accent); }
+  100% { transform: scale(1); }
+}
+
+/* Image inside div.choice */
+.choice img {
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+  transition: transform 0.2s ease, filter 0.2s ease;
+  pointer-events: none;
+  border: none;
+  background: transparent;
+  border-radius: 0;
+}
+
+.choice:hover img {
+  filter: drop-shadow(0 6px 16px rgba(232, 255, 58, 0.3));
+  transform: scale(1.1);
+}
+
+/* Standalone img.choice (prevent double-styling) */
+img.choice {
+  all: unset;
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+  transition: transform 0.2s ease, filter 0.2s ease;
+  pointer-events: none;
+}
+
+
+/* ─── Score Board ─── */
+.score-board {
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 1.5rem 3rem;
+  position: relative;
+  z-index: 1;
+}
+
+.score-board::before {
+  content: 'VS';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.2rem;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+
+.score {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+#user-score,
+#comp-score {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 3.5rem;
+  line-height: 1;
+  color: var(--accent);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.3s ease;
+  display: block;
+}
+
+.score p:last-child {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Score bump animation */
+.score-bump {
+  animation: bump 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes bump {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.35); }
+  100% { transform: scale(1); }
+}
+
+
+/* ─── Message Container ─── */
+.msg-container {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem 2.5rem;
+  position: relative;
+  z-index: 1;
+  min-width: 280px;
+  text-align: center;
+}
+
+#msg {
+  font-size: 1rem;
+  font-weight: 500;
+  color:black;
+  letter-spacing: 0.04em;
+  transition: color 0.3s ease;
+}
+
+#msg.win  { color: var(--win);  }
+#msg.lose { color: var(--lose); }
+#msg.tie  { color: var(--tie);  }
+
+
+/* ─── Responsive ─── */
+@media (max-width: 480px) {
+  .choices {
+    gap: 1rem;
+  }
+
+  .choice {
+    width: 90px;
+    height: 90px;
+    border-radius: 12px;
+  }
+
+  img.choice,
+  .choice img {
+    width: 52px;
+    height: 52px;
+  }
+
+  .score-board {
+    gap: 2rem;
+    padding: 1.25rem 2rem;
+  }
+
+  #user-score,
+  #comp-score {
+    font-size: 2.8rem;
+  }
+}
